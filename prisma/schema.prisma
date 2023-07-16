@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model SequelizeMeta {
+  name String @id @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model AccountUser {
+  id           BigInt    @id @default(autoincrement())
+  uuid         String?   @unique(map: "account_user__uuid_uq_index") @db.Uuid
+  accountType  Int       @map("account_type")
+  accountMail  String    @map("account_mail") @db.VarChar(200)
+  accountState Int       @default(0) @map("account_state")
+  userName     String    @map("user_name") @db.VarChar(200)
+  userLogoKey  String?   @map("user_logo_key") @db.VarChar(64)
+  activate     Int?      @default(1)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt    DateTime  @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([accountMail, activate], map: "account_user__account_mail_uq_index")
+  @@index([accountState], map: "account_user__account_state_index")
+  @@index([accountType], map: "account_user__account_type_index")
+  @@index([userName], map: "account_user__user_name_index")
+  @@map("account_user")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model WebLog {
+  id            Int      @id @default(autoincrement())
+  uuid          String   @db.Uuid
+  webLogTitle   String   @map("web_log_title") @db.VarChar(64)
+  webLogContent String   @map("web_log_content") @db.VarChar(64)
+  image         String?
+  updatedAt     DateTime @map("updated_at") @db.Timestamptz(6)
+  createdAt     DateTime @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt], map: "web_log__created_at_index")
+  @@index([updatedAt], map: "web_log__updated_at_index")
+  @@index([uuid], map: "web_log__uuid_index")
+  @@index([webLogContent], map: "web_log__web_log_content_index")
+  @@index([webLogTitle], map: "web_log__web_log_title_index")
+  @@map("web_log")
+}
